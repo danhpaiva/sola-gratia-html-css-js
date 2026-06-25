@@ -1,12 +1,16 @@
 (() => {
   'use strict';
 
-  const pillarsSection = document.getElementById('pillars');
-  const pillarsGrid    = document.getElementById('pillars-grid');
-  const detailSection  = document.getElementById('pillar-detail');
-  const detailHeader   = document.getElementById('detail-header');
-  const versesList     = document.getElementById('verses-list');
-  const backBtn        = document.getElementById('back-btn');
+  const pillarsSection  = document.getElementById('pillars');
+  const pillarsGrid     = document.getElementById('pillars-grid');
+  const detailSection   = document.getElementById('pillar-detail');
+  const detailHeader    = document.getElementById('detail-header');
+  const versesList      = document.getElementById('verses-list');
+  const backBtn         = document.getElementById('back-btn');
+  const searchInput     = document.getElementById('search-input');
+  const searchClear     = document.getElementById('search-clear');
+  const searchStatus    = document.getElementById('search-status');
+  const searchResults   = document.getElementById('search-results');
 
   // ── Render card grid ─────────────────────────────────────────────────────
   function renderGrid() {
@@ -128,6 +132,137 @@
     if (e.key === 'Escape' && !detailSection.hidden) {
       backBtn.click();
     }
+  });
+
+  // ── Search ───────────────────────────────────────────────────────────────
+  function normalize(str) {
+    return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  }
+
+  function highlight(text, query) {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`(${escaped})`, 'gi');
+    return text.replace(re, '<mark>$1</mark>');
+  }
+
+  function runSearch(raw) {
+    const query   = raw.trim();
+    const normQ   = normalize(query);
+
+    searchClear.hidden = query.length === 0;
+
+    if (!query) {
+      searchResults.hidden = true;
+      pillarsGrid.hidden   = false;
+      searchStatus.textContent = '';
+      return;
+    }
+
+    pillarsGrid.hidden   = true;
+    searchResults.hidden = false;
+    searchResults.innerHTML = '';
+
+    let totalHits = 0;
+    const fragment = document.createDocumentFragment();
+
+    PILLARS.forEach((pillar, pillarIndex) => {
+      const hits = pillar.verses.filter(v =>
+        normalize(v.ref).includes(normQ) || normalize(v.text).includes(normQ)
+      );
+      if (!hits.length) return;
+
+      totalHits += hits.length;
+
+      const group = document.createElement('div');
+      group.className = 'search-group';
+      group.setAttribute('role', 'listitem');
+
+      group.innerHTML = `
+        <div class="search-group-header">
+          <span class="search-group-icon" aria-hidden="true">${pillar.icon}</span>
+          <span class="search-group-title">${pillar.title}</span>
+          <span class="search-group-count">${hits.length} resultado${hits.length > 1 ? 's' : ''}</span>
+        </div>
+      `;
+
+      hits.forEach(verse => {
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('aria-label', `${verse.ref} — abrir em ${pillar.title}`);
+
+        item.innerHTML = `
+          <div class="search-result-ref">${highlight(verse.ref, query)}</div>
+          <div class="search-result-text">${highlight(verse.text, query)}</div>
+        `;
+
+        const open = () => {
+          clearSearch();
+          showDetail(pillarIndex);
+          // Open the matching accordion item after render
+          requestAnimationFrame(() => {
+            const allBtns = versesList.querySelectorAll('.verse-btn');
+            const target  = [...allBtns].find(b =>
+              normalize(b.querySelector('.verse-ref').textContent) === normalize(verse.ref)
+            );
+            if (target) {
+              const parentItem = target.closest('.verse-item');
+              toggleVerse(parentItem, target);
+              target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          });
+        };
+
+        item.addEventListener('click', open);
+        item.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+        });
+
+        group.appendChild(item);
+      });
+
+      fragment.appendChild(group);
+    });
+
+    if (totalHits === 0) {
+      searchResults.innerHTML = `
+        <div class="search-empty" role="listitem">
+          <div class="search-empty-icon" aria-hidden="true">📖</div>
+          <p>Nenhum resultado para <strong>"${query}"</strong>.<br>Tente outro termo ou referência.</p>
+        </div>
+      `;
+    } else {
+      searchResults.appendChild(fragment);
+    }
+
+    searchStatus.textContent = totalHits > 0
+      ? `${totalHits} versículo${totalHits > 1 ? 's' : ''} encontrado${totalHits > 1 ? 's' : ''}`
+      : '';
+  }
+
+  function clearSearch() {
+    searchInput.value    = '';
+    searchClear.hidden   = true;
+    searchStatus.textContent = '';
+    searchResults.hidden = true;
+    pillarsGrid.hidden   = false;
+  }
+
+  let debounceTimer;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => runSearch(searchInput.value), 200);
+  });
+
+  searchClear.addEventListener('click', () => {
+    clearSearch();
+    searchInput.focus();
+  });
+
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Escape') clearSearch();
   });
 
   // ── Theme toggle ─────────────────────────────────────────────────────────
