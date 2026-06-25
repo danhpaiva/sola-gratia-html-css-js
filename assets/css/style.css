@@ -7,24 +7,24 @@
 
 /* ── Light theme (default) ── */
 :root {
-  --crimson:        #8b1f1f;
-  --crimson-dark:   #5a1515;
-  --crimson-light:  #b03030;
-  --gold:           #c9a84c;
-  --gold-light:     #e8d5a3;
+  --crimson:        #1e3a5f;
+  --crimson-dark:   #0f1f35;
+  --crimson-light:  #2d5282;
+  --gold:           #eab308;
+  --gold-light:     #fef08a;
 
-  --bg-page:        #faf7f2;
+  --bg-page:        #f8fafc;
   --bg-surface:     #ffffff;
-  --bg-subtle:      #f3ece0;
-  --text-primary:   #18120a;
-  --text-secondary: #44332a;
-  --text-muted:     #7a6555;
-  --border:         #e2d4c0;
+  --bg-subtle:      #f0f4f8;
+  --text-primary:   #0d1f33;
+  --text-secondary: #334155;
+  --text-muted:     #64748b;
+  --border:         #dde3ea;
 
-  --shadow-sm:   0 1px 4px rgba(0,0,0,.07);
-  --shadow-md:   0 4px 16px rgba(0,0,0,.10);
-  --shadow-lg:   0 12px 32px rgba(0,0,0,.14);
-  --shadow-card: 0 4px 24px rgba(139,31,31,.10);
+  --shadow-sm:   0 1px 4px rgba(0,0,0,.06);
+  --shadow-md:   0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg:   0 12px 32px rgba(0,0,0,.13);
+  --shadow-card: 0 4px 24px rgba(30,58,95,.12);
   --radius-sm:  8px;
   --radius-md:  16px;
   --radius-lg:  24px;
@@ -35,33 +35,33 @@
 
 /* ── Dark theme variables ── */
 [data-theme="dark"] {
-  --bg-page:        #0f0a07;
-  --bg-surface:     #1c1410;
-  --bg-subtle:      #261c15;
-  --text-primary:   #f0e6d3;
-  --text-secondary: #c4a882;
-  --text-muted:     #8a7060;
-  --border:         #3a2a1f;
+  --bg-page:        #080e1a;
+  --bg-surface:     #111827;
+  --bg-subtle:      #1a2537;
+  --text-primary:   #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #94a3b8;
+  --border:         #1e3a5f;
 
-  --shadow-sm:  0 1px 3px rgba(0,0,0,.3);
-  --shadow-md:  0 4px 12px rgba(0,0,0,.4);
-  --shadow-lg:  0 8px 24px rgba(0,0,0,.5);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.35);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.45);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,.55);
 }
 
 /* ── System dark preference (auto) ── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg-page:        #0f0a07;
-    --bg-surface:     #1c1410;
-    --bg-subtle:      #261c15;
-    --text-primary:   #f0e6d3;
-    --text-secondary: #c4a882;
-    --text-muted:     #8a7060;
-    --border:         #3a2a1f;
+    --bg-page:        #080e1a;
+    --bg-surface:     #111827;
+    --bg-subtle:      #1a2537;
+    --text-primary:   #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted:     #94a3b8;
+    --border:         #1e3a5f;
 
-    --shadow-sm:  0 1px 3px rgba(0,0,0,.3);
-    --shadow-md:  0 4px 12px rgba(0,0,0,.4);
-    --shadow-lg:  0 8px 24px rgba(0,0,0,.5);
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.35);
+    --shadow-md:  0 4px 12px rgba(0,0,0,.45);
+    --shadow-lg:  0 8px 24px rgba(0,0,0,.55);
   }
 }
 
@@ -105,8 +105,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: 0 2px 20px rgba(90,21,21,.35);
-  border-bottom: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 2px 20px rgba(8,14,26,.4);
+  border-bottom: 1px solid rgba(255,255,255,.07);
 }
 
 .header-inner {
@@ -185,7 +185,7 @@ body {
 
 /* ===== HERO ===== */
 .hero {
-  background: linear-gradient(160deg, var(--crimson-dark) 0%, var(--crimson) 55%, #a83232 100%);
+  background: linear-gradient(160deg, var(--crimson-dark) 0%, var(--crimson) 55%, #2d5282 100%);
   padding: 5.5rem 1.5rem 5rem;
   text-align: center;
   position: relative;
@@ -305,7 +305,7 @@ body {
 
 .search-input:focus {
   border-color: var(--crimson-light);
-  box-shadow: 0 0 0 3px rgba(123,29,29,.15);
+  box-shadow: 0 0 0 3px rgba(30,58,95,.15);
 }
 
 /* Hide browser's native clear button */
@@ -409,7 +409,7 @@ body {
 }
 
 .search-result-text mark {
-  background: rgba(201,168,76,.35);
+  background: rgba(234,179,8,.35);
   color: inherit;
   border-radius: 2px;
   padding: 0 1px;
@@ -417,7 +417,7 @@ body {
 }
 
 [data-theme="dark"] .search-result-text mark {
-  background: rgba(201,168,76,.22);
+  background: rgba(234,179,8,.25);
 }
 
 .search-empty {
@@ -647,7 +647,7 @@ body {
 .progress-fill {
   height: 100%;
   border-radius: 99px;
-  background: linear-gradient(90deg, var(--crimson-dark), var(--crimson-light));
+  background: linear-gradient(90deg, var(--crimson-dark), var(--gold));
   transition: width 400ms cubic-bezier(.4, 0, .2, 1);
   min-width: 0;
 }
@@ -1048,7 +1048,7 @@ body {
   color: var(--crimson) !important;
   border-left: 3px solid var(--gold);
   padding-left: 1.25rem;
-  background: rgba(201,168,76,.06);
+  background: rgba(234,179,8,.06);
   padding-top: .75rem;
   padding-bottom: .75rem;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
@@ -1061,11 +1061,11 @@ body {
 
 /* ===== FOOTER ===== */
 .site-footer {
-  background: linear-gradient(135deg, var(--crimson-dark) 0%, #3d0a0a 100%);
+  background: linear-gradient(135deg, var(--crimson-dark) 0%, #07111f 100%);
   color: var(--gold-light);
   padding: 3rem 1.5rem;
   text-align: center;
-  border-top: 1px solid rgba(201,168,76,.2);
+  border-top: 1px solid rgba(234,179,8,.2);
 }
 
 .footer-inner {
@@ -1217,7 +1217,7 @@ body {
     --text-secondary: #111;
     --text-muted:     #555;
     --border:         #ccc;
-    --crimson:        #6b0000;
+    --crimson:        #1e3a5f;
   }
 
   body {
@@ -1263,7 +1263,7 @@ body {
   .fav-header h2 {
     font-family: Georgia, serif;
     font-size: 18pt;
-    color: #6b0000;
+    color: #1e3a5f;
     margin-bottom: .5rem;
     page-break-after: avoid;
   }
@@ -1272,7 +1272,7 @@ body {
   .fav-title-icon { display: none; }
 
   .detail-header {
-    border-bottom: 2pt solid #6b0000;
+    border-bottom: 2pt solid #1e3a5f;
     margin-bottom: 1rem;
     padding-bottom: .5rem;
   }
@@ -1313,7 +1313,7 @@ body {
     font-family: Georgia, serif;
     font-size: 10pt;
     font-weight: 700;
-    color: #6b0000;
+    color: #1e3a5f;
   }
 
   .verse-chevron { display: none; }
@@ -1329,7 +1329,7 @@ body {
   }
 
   /* ── Favorites view ── */
-  .fav-header { border-bottom: 2pt solid #6b0000; margin-bottom: 1rem; }
+  .fav-header { border-bottom: 2pt solid #1e3a5f; margin-bottom: 1rem; }
   .fav-description { display: none; }
   .fav-group-header {
     border-bottom: 1pt solid #aaa;
@@ -1346,7 +1346,7 @@ body {
     page-break-inside: avoid;
     break-inside: avoid;
   }
-  .fav-item-ref { color: #6b0000; font-size: 10pt; font-weight: 700; margin-bottom: .2rem; }
+  .fav-item-ref { color: #1e3a5f; font-size: 10pt; font-weight: 700; margin-bottom: .2rem; }
   .fav-item-text { font-size: 10.5pt; margin-bottom: 0; }
 
   /* ── Print footer ── */
