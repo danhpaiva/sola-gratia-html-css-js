@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#3d0a0a"/>
+      <stop offset="60%"  stop-color="#7b1d1d"/>
+      <stop offset="100%" stop-color="#9b2c2c"/>
+    </linearGradient>
+    <linearGradient id="divider" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#c9a84c" stop-opacity="0"/>
+      <stop offset="30%"  stop-color="#c9a84c"/>
+      <stop offset="70%"  stop-color="#c9a84c"/>
+      <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle texture overlay -->
+  <rect width="1200" height="630" fill="none" stroke="#c9a84c" stroke-width="12" rx="0" opacity="0.15"/>
+
+  <!-- Gold accent line top -->
+  <rect x="0" y="0" width="1200" height="5" fill="#c9a84c" opacity="0.6"/>
+  <!-- Gold accent line bottom -->
+  <rect x="0" y="625" width="1200" height="5" fill="#c9a84c" opacity="0.6"/>
+
+  <!-- Main title -->
+  <text x="600" y="185"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="72" font-weight="700"
+        fill="#fff"
+        text-anchor="middle"
+        letter-spacing="1">As Doutrinas da Graça</text>
+
+  <!-- Subtitle -->
+  <text x="600" y="245"
+        font-family="Georgia, serif"
+        font-size="28" font-style="italic"
+        fill="#e8d5a3"
+        text-anchor="middle">A soberania de Deus na salvação</text>
+
+  <!-- Gold divider -->
+  <rect x="200" y="278" width="800" height="2" fill="url(#divider)" opacity="0.7"/>
+
+  <!-- 6 pillars — two rows of 3 -->
+  <!-- Row 1 -->
+  <g font-family="Arial, sans-serif" font-size="19" fill="#f0e6d3" text-anchor="middle">
+    <text x="200" y="340">👑 Soberania Exaustiva</text>
+    <text x="600" y="340">💔 Depravação Total</text>
+    <text x="1000" y="340">✝️ Eleição Incondicional</text>
+  </g>
+  <!-- Row 2 -->
+  <g font-family="Arial, sans-serif" font-size="19" fill="#f0e6d3" text-anchor="middle">
+    <text x="200" y="390">🩸 Expiação Particular</text>
+    <text x="600" y="390">🕊️ Chamado Eficaz</text>
+    <text x="1000" y="390">🛡️ Preservação Eterna</text>
+  </g>
+
+  <!-- Divider 2 -->
+  <rect x="200" y="420" width="800" height="1" fill="url(#divider)" opacity="0.4"/>
+
+  <!-- Scripture verse -->
+  <text x="600" y="472"
+        font-family="Georgia, serif"
+        font-size="22" font-style="italic"
+        fill="#c9a84c"
+        text-anchor="middle">"Porque Deus nos escolheu nele antes da criação do mundo"</text>
+  <text x="600" y="508"
+        font-family="Arial, sans-serif"
+        font-size="17" font-weight="600"
+        fill="#e8d5a3"
+        text-anchor="middle"
+        letter-spacing="2">EFÉSIOS 1.4 — NVI</text>
+
+  <!-- Bottom label -->
+  <text x="600" y="575"
+        font-family="Arial, sans-serif"
+        font-size="16"
+        fill="#c9a84c"
+        text-anchor="middle"
+        opacity="0.8"
+        letter-spacing="3">150 VERSÍCULOS · 6 PILARES · NVI</text>
+</svg>
