@@ -49,6 +49,41 @@
     });
   }
 
+  // ── Progress tracking ────────────────────────────────────────────────────
+  const PROGRESS_PREFIX = 'sg-progress-';
+
+  function loadProgress(pillarId) {
+    try {
+      const raw = localStorage.getItem(PROGRESS_PREFIX + pillarId);
+      return raw ? new Set(JSON.parse(raw)) : new Set();
+    } catch { return new Set(); }
+  }
+
+  function saveProgress(pillarId, set) {
+    try {
+      localStorage.setItem(PROGRESS_PREFIX + pillarId, JSON.stringify([...set]));
+    } catch {}
+  }
+
+  function renderProgressBar(pillar, readSet) {
+    const total    = pillar.verses.length;
+    const read     = readSet.size;
+    const pct      = total > 0 ? Math.round((read / total) * 100) : 0;
+    const complete = read === total;
+
+    const wrap = document.getElementById('progress-wrap');
+    if (!wrap) return;
+
+    wrap.classList.toggle('is-complete', complete);
+    wrap.querySelector('.progress-fill').style.width     = `${pct}%`;
+    wrap.querySelector('.progress-fraction').textContent = `${read} / ${total}`;
+
+    const track = wrap.querySelector('.progress-track');
+    track.setAttribute('aria-valuenow', read);
+    track.setAttribute('aria-label',
+      complete ? 'Todos os versículos lidos' : `${read} de ${total} versículos lidos`);
+  }
+
   // ── Show pillar detail ────────────────────────────────────────────────────
   // push: false when called by popstate (browser already updated the URL)
   function showDetail(index, { push = true } = {}) {
@@ -61,11 +96,28 @@
 
     document.title = `${pillar.title} — As Doutrinas da Graça`;
 
+    const readSet = loadProgress(pillar.id);
+
     detailHeader.innerHTML = `
       <span class="detail-icon" aria-hidden="true">${pillar.icon}</span>
       <h2 class="detail-title">${pillar.title}</h2>
       <p class="detail-description">${pillar.description}</p>
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-header">
+          <span class="progress-label">Progresso de leitura</span>
+          <span class="progress-fraction">0 / ${pillar.verses.length}</span>
+          <span class="progress-complete-badge" aria-live="polite">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Concluído!
+          </span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="${pillar.verses.length}" aria-valuenow="0" aria-label="Versículos lidos">
+          <div class="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
     `;
+
+    renderProgressBar(pillar, readSet);
 
     versesList.innerHTML = '';
 
@@ -97,7 +149,7 @@
       `;
 
       const btn = item.querySelector('.verse-btn');
-      btn.addEventListener('click', () => toggleVerse(item, btn));
+      btn.addEventListener('click', () => toggleVerse(item, btn, pillar, verse.ref));
 
       versesList.appendChild(item);
     });
@@ -125,7 +177,7 @@
   }
 
   // ── Toggle accordion item ─────────────────────────────────────────────────
-  function toggleVerse(item, btn) {
+  function toggleVerse(item, btn, pillar, verseRef) {
     const isOpen = item.classList.contains('is-open');
 
     versesList.querySelectorAll('.verse-item.is-open').forEach(openItem => {
@@ -136,6 +188,14 @@
     if (!isOpen) {
       item.classList.add('is-open');
       btn.setAttribute('aria-expanded', 'true');
+
+      // Mark as read and update progress
+      if (pillar && verseRef) {
+        const readSet = loadProgress(pillar.id);
+        readSet.add(verseRef);
+        saveProgress(pillar.id, readSet);
+        renderProgressBar(pillar, readSet);
+      }
     }
   }
 
@@ -239,7 +299,7 @@
             );
             if (target) {
               const parentItem = target.closest('.verse-item');
-              toggleVerse(parentItem, target);
+              toggleVerse(parentItem, target, pillar, verse.ref);
               target.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           });
