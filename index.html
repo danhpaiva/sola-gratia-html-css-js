@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="As Doutrinas da Graça — estudo bíblico dos cinco pontos da soberania de Deus na salvação, com versículos completos da NVI." />
+  <title>As Doutrinas da Graça</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <div class="header-text">
+        <h1 class="site-title">As Doutrinas da Graça</h1>
+        <p class="site-subtitle">A soberania de Deus na salvação — versículos da NVI</p>
+      </div>
+      <nav class="header-nav" aria-label="Navegação principal">
+        <a href="#pillars" class="nav-link">Pilares</a>
+        <a href="#sobre" class="nav-link">Sobre</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-inner">
+        <blockquote class="hero-verse">
+          <p>"Porque Deus nos escolheu nele antes da criação do mundo para sermos santos e irrepreensíveis em sua presença."</p>
+          <cite>Efésios 1.4 — NVI</cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <section id="pillars" class="pillars-section" aria-labelledby="pillars-heading">
+      <div class="section-inner">
+        <h2 id="pillars-heading" class="section-title">Os Seis Pilares</h2>
+        <p class="section-lead">Selecione um pilar para explorar os versículos bíblicos que o fundamentam.</p>
+        <div id="pillars-grid" class="pillars-grid" role="list">
+          <!-- Cards injetados pelo app.js -->
+        </div>
+      </div>
+    </section>
+
+    <section id="pillar-detail" class="detail-section" aria-live="polite" hidden>
+      <div class="section-inner">
+        <button id="back-btn" class="back-btn" aria-label="Voltar para os pilares">
+          <span aria-hidden="true">←</span> Voltar
+        </button>
+        <div id="detail-header" class="detail-header"></div>
+        <div id="verses-list" class="verses-list" role="list">
+          <!-- Versículos injetados pelo app.js -->
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre" class="about-section" aria-labelledby="about-heading">
+      <div class="section-inner about-inner">
+        <h2 id="about-heading" class="section-title">Sobre as Doutrinas da Graça</h2>
+        <div class="about-content">
+          <p>
+            As Doutrinas da Graça, também conhecidas como os Cinco Pontos do Calvinismo, sistematizam o ensino bíblico
+            sobre a salvação como uma obra exclusiva de Deus. Longe de ser uma elaboração teológica árida, cada doutrina
+            brota diretamente das Escrituras e exalta a soberania e a misericórdia do Criador.
+          </p>
+          <p>
+            Este estudo apresenta <strong>seis pilares</strong> conforme a sistematização da Fireland Missions, incluindo
+            a <em>Soberania Exaustiva</em> como fundamento de todos os demais. Os versículos estão na tradução
+            <strong>Nova Versão Internacional (NVI)</strong>.
+          </p>
+          <p class="about-note">
+            "O Senhor dos Exércitos planejou; quem pode anulá-lo?" — <cite>Isaías 14.27</cite>
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <p>Versículos da <strong>Nova Versão Internacional (NVI)</strong>.</p>
+      <p class="footer-ref">Baseado em material da <em>Fireland Missions</em> · © 2013</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
