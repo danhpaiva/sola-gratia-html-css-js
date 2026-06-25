@@ -49,6 +49,65 @@
     });
   }
 
+  // ── Book abbreviation → full name (NVI PT) ───────────────────────────────
+  const BOOK_NAMES = {
+    'Gn':'Gênesis','Ex':'Êxodo','Lv':'Levítico','Nm':'Números','Dt':'Deuteronômio',
+    'Js':'Josué','Jz':'Juízes','Rt':'Rute',
+    '1 Sm':'1 Samuel','2 Sm':'2 Samuel',
+    '1 Rs':'1 Reis','2 Rs':'2 Reis',
+    '1 Cr':'1 Crônicas','2 Cr':'2 Crônicas',
+    'Ed':'Esdras','Ne':'Neemias','Et':'Ester',
+    'Jó':'Jó','Sl':'Salmos','Pv':'Provérbios','Ec':'Eclesiastes','Ct':'Cântico dos Cânticos',
+    'Is':'Isaías','Jr':'Jeremias','Lm':'Lamentações','Ez':'Ezequiel','Dn':'Daniel',
+    'Os':'Oséias','Jl':'Joel','Am':'Amós','Ab':'Obadias','Jn':'Jonas',
+    'Mq':'Miquéias','Na':'Naum','Hc':'Habacuque','Sf':'Sofonias','Ag':'Ageu',
+    'Zc':'Zacarias','Ml':'Malaquias',
+    'Mt':'Mateus','Mc':'Marcos','Lc':'Lucas','Jo':'João',
+    'At':'Atos dos Apóstolos',
+    'Rm':'Romanos',
+    '1 Co':'1 Coríntios','2 Co':'2 Coríntios',
+    'Gl':'Gálatas','Ef':'Efésios','Fp':'Filipenses','Cl':'Colossenses',
+    '1 Ts':'1 Tessalonicenses','2 Ts':'2 Tessalonicenses',
+    '1 Tm':'1 Timóteo','2 Tm':'2 Timóteo',
+    'Tt':'Tito','Fm':'Filemom','Hb':'Hebreus','Tg':'Tiago',
+    '1 Pe':'1 Pedro','2 Pe':'2 Pedro',
+    '1 Jo':'1 João','2 Jo':'2 João','3 Jo':'3 João',
+    'Jd':'Judas','Ap':'Apocalipse',
+  };
+
+  // "Rm 8.28-30" → "Romanos 8.28-30"
+  function expandRef(ref) {
+    // Try longest match first (e.g. "1 Co" before "Co")
+    const sorted = Object.keys(BOOK_NAMES).sort((a, b) => b.length - a.length);
+    for (const abbr of sorted) {
+      if (ref.startsWith(abbr)) {
+        return BOOK_NAMES[abbr] + ref.slice(abbr.length);
+      }
+    }
+    return ref;
+  }
+
+  function copyVerse(ref, text, btn) {
+    const fullRef = expandRef(ref);
+    const payload = `${text}\n${fullRef} — NVI`;
+
+    navigator.clipboard.writeText(payload).then(() => {
+      btn.classList.add('is-copied');
+      setTimeout(() => btn.classList.remove('is-copied'), 2000);
+    }).catch(() => {
+      // Fallback for older browsers / non-https
+      const ta = document.createElement('textarea');
+      ta.value = payload;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      btn.classList.add('is-copied');
+      setTimeout(() => btn.classList.remove('is-copied'), 2000);
+    });
+  }
+
   // ── Progress tracking ────────────────────────────────────────────────────
   const PROGRESS_PREFIX = 'sg-progress-';
 
@@ -144,12 +203,30 @@
         <div class="verse-body" id="${bodyId}" role="region" aria-labelledby="${btnId}">
           <div class="verse-body-inner">
             <p class="verse-text">${verse.text}</p>
+            <div class="verse-footer">
+              <button class="copy-btn" aria-label="Copiar ${verse.ref}" tabindex="-1">
+                <span class="copy-icon-default">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  Copiar
+                </span>
+                <span class="copy-icon-done">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  Copiado!
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       `;
 
-      const btn = item.querySelector('.verse-btn');
+      const btn     = item.querySelector('.verse-btn');
+      const copyBtn = item.querySelector('.copy-btn');
+
       btn.addEventListener('click', () => toggleVerse(item, btn, pillar, verse.ref));
+      copyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyVerse(verse.ref, verse.text, copyBtn);
+      });
 
       versesList.appendChild(item);
     });
@@ -183,11 +260,13 @@
     versesList.querySelectorAll('.verse-item.is-open').forEach(openItem => {
       openItem.classList.remove('is-open');
       openItem.querySelector('.verse-btn').setAttribute('aria-expanded', 'false');
+      openItem.querySelector('.copy-btn')?.setAttribute('tabindex', '-1');
     });
 
     if (!isOpen) {
       item.classList.add('is-open');
       btn.setAttribute('aria-expanded', 'true');
+      item.querySelector('.copy-btn')?.setAttribute('tabindex', '0');
 
       // Mark as read and update progress
       if (pillar && verseRef) {

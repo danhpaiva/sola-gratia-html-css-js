@@ -691,15 +691,61 @@ body {
   overflow: hidden;
 }
 
+.verse-body-inner {
+  border-top: 1px solid var(--border);
+}
+
 .verse-text {
   font-family: var(--font-serif);
   font-size: 1rem;
   line-height: 1.8;
   color: var(--text-secondary);
-  padding: .75rem 1.25rem 1.25rem;
-  border-top: 1px solid var(--border);
+  padding: .85rem 1.25rem .65rem;
   font-style: italic;
 }
+
+.verse-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1.25rem .85rem;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .65rem;
+  font-family: var(--font-sans);
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition),
+              border-color var(--transition);
+}
+
+.copy-btn:hover,
+.copy-btn:focus-visible {
+  color: var(--crimson);
+  background: var(--bg-surface);
+  border-color: var(--crimson-light);
+  outline: none;
+}
+
+.copy-btn.is-copied {
+  color: #16a34a;
+  border-color: #16a34a;
+  background: var(--bg-surface);
+  pointer-events: none;
+}
+
+.copy-btn .copy-icon-default { display: flex; align-items: center; gap: .35rem; }
+.copy-btn .copy-icon-done    { display: none;  align-items: center; gap: .35rem; }
+.copy-btn.is-copied .copy-icon-default { display: none; }
+.copy-btn.is-copied .copy-icon-done    { display: flex; }
 
 /* ===== ABOUT SECTION ===== */
 .about-section {
