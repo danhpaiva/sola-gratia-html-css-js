@@ -130,6 +130,41 @@
     }
   });
 
+  // ── Theme toggle ─────────────────────────────────────────────────────────
+  const html        = document.documentElement;
+  const themeBtn    = document.getElementById('theme-toggle');
+  const STORAGE_KEY = 'sg-theme';
+
+  function resolvedTheme() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function applyTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    themeBtn.setAttribute('aria-label',
+      theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro');
+  }
+
+  function toggleTheme() {
+    const next = resolvedTheme() === 'dark' ? 'light' : 'dark';
+    localStorage.setItem(STORAGE_KEY, next);
+    applyTheme(next);
+  }
+
+  themeBtn.addEventListener('click', toggleTheme);
+
+  // Apply on load (saved preference or system default)
+  applyTheme(resolvedTheme());
+
+  // React to OS-level changes when no manual preference is saved
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+
   // ── Boot ──────────────────────────────────────────────────────────────────
   renderGrid();
 })();

@@ -5,27 +5,68 @@
   padding: 0;
 }
 
+/* ── Light theme (default) ── */
 :root {
   --crimson:        #7b1d1d;
   --crimson-dark:   #5a1515;
   --crimson-light:  #9b2c2c;
   --gold:           #c9a84c;
   --gold-light:     #e8d5a3;
-  --cream:          #fdf8f0;
-  --cream-dark:     #f5ede0;
+
+  --bg-page:        #fdf8f0;
+  --bg-surface:     #ffffff;
+  --bg-subtle:      #f5ede0;
   --text-primary:   #1a1207;
   --text-secondary: #4a3728;
   --text-muted:     #7a6555;
   --border:         #ddd0bc;
-  --shadow-sm:      0 1px 3px rgba(0,0,0,.08);
-  --shadow-md:      0 4px 12px rgba(0,0,0,.12);
-  --shadow-lg:      0 8px 24px rgba(0,0,0,.16);
-  --radius-sm:      6px;
-  --radius-md:      12px;
-  --radius-lg:      20px;
-  --transition:     200ms ease;
-  --font-serif:     'Lora', Georgia, serif;
-  --font-sans:      'Inter', system-ui, sans-serif;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.08);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.12);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,.16);
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --transition: 200ms ease;
+  --font-serif: 'Lora', Georgia, serif;
+  --font-sans:  'Inter', system-ui, sans-serif;
+}
+
+/* ── Dark theme variables ── */
+[data-theme="dark"] {
+  --bg-page:        #0f0a07;
+  --bg-surface:     #1c1410;
+  --bg-subtle:      #261c15;
+  --text-primary:   #f0e6d3;
+  --text-secondary: #c4a882;
+  --text-muted:     #8a7060;
+  --border:         #3a2a1f;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.3);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.4);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,.5);
+}
+
+/* ── System dark preference (auto) ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page:        #0f0a07;
+    --bg-surface:     #1c1410;
+    --bg-subtle:      #261c15;
+    --text-primary:   #f0e6d3;
+    --text-secondary: #c4a882;
+    --text-muted:     #8a7060;
+    --border:         #3a2a1f;
+
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.3);
+    --shadow-md:  0 4px 12px rgba(0,0,0,.4);
+    --shadow-lg:  0 8px 24px rgba(0,0,0,.5);
+  }
+}
+
+/* ── Smooth theme transition ── */
+body, .site-header, .pillar-card, .verse-item, .about-section, .site-footer {
+  transition: background-color 250ms ease, border-color 250ms ease, color 250ms ease;
 }
 
 html {
@@ -35,7 +76,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--cream);
+  background-color: var(--bg-page);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -181,7 +222,7 @@ body {
 }
 
 .pillar-card {
-  background: #fff;
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 1.75rem;
@@ -249,7 +290,7 @@ body {
   font-size: .8rem;
   font-weight: 600;
   color: var(--text-muted);
-  background: var(--cream-dark);
+  background: var(--bg-subtle);
   padding: .25rem .65rem;
   border-radius: 20px;
 }
@@ -337,7 +378,7 @@ body {
 }
 
 .verse-item {
-  background: #fff;
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -370,12 +411,12 @@ body {
 
 .verse-btn:hover,
 .verse-btn:focus-visible {
-  background: var(--cream-dark);
+  background: var(--bg-subtle);
   outline: none;
 }
 
 .verse-item.is-open .verse-btn {
-  background: var(--cream-dark);
+  background: var(--bg-subtle);
   color: var(--crimson);
 }
 
@@ -420,9 +461,46 @@ body {
 
 /* ===== ABOUT SECTION ===== */
 .about-section {
-  background: var(--cream-dark);
+  background: var(--bg-subtle);
   padding: 4rem 0;
   border-top: 1px solid var(--border);
+}
+
+/* ===== THEME TOGGLE ===== */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: var(--radius-sm);
+  color: var(--gold-light);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  background: rgba(255,255,255,.22);
+  color: #fff;
+  border-color: rgba(255,255,255,.4);
+  outline: none;
+}
+
+/* Show/hide sun vs moon based on active theme */
+.icon-moon { display: none; }
+.icon-sun  { display: block; }
+
+[data-theme="dark"] .icon-sun  { display: none; }
+[data-theme="dark"] .icon-moon { display: block; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon-sun  { display: none; }
+  :root:not([data-theme="light"]) .icon-moon { display: block; }
 }
 
 .about-inner {
