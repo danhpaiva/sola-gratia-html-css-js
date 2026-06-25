@@ -231,6 +231,27 @@
       versesList.appendChild(item);
     });
 
+    // Toolbar: abrir/fechar todos (remove previous if re-entering)
+    document.querySelector('.verses-toolbar')?.remove();
+    const toolbar = document.createElement('div');
+    toolbar.className = 'verses-toolbar';
+    toolbar.innerHTML = `
+      <button class="toggle-all-btn" id="toggle-all-btn" aria-label="Abrir todos os versículos">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" class="icon-expand">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" class="icon-collapse" style="display:none">
+          <path d="M18 15l-6-6-6 6"/>
+        </svg>
+        <span class="toggle-all-label">Abrir todos</span>
+      </button>
+    `;
+    versesList.before(toolbar);
+
+    document.getElementById('toggle-all-btn').addEventListener('click', () => {
+      toggleAll(pillar);
+    });
+
     pillarsSection.hidden = true;
     detailSection.hidden  = false;
     clearSearch();
@@ -275,6 +296,42 @@
         saveProgress(pillar.id, readSet);
         renderProgressBar(pillar, readSet);
       }
+    }
+  }
+
+  // ── Toggle all verses ────────────────────────────────────────────────────
+  function toggleAll(pillar) {
+    const btn      = document.getElementById('toggle-all-btn');
+    const items    = [...versesList.querySelectorAll('.verse-item')];
+    const allOpen  = items.every(i => i.classList.contains('is-open'));
+
+    if (allOpen) {
+      // Close all
+      items.forEach(item => {
+        item.classList.remove('is-open');
+        item.querySelector('.verse-btn').setAttribute('aria-expanded', 'false');
+        item.querySelector('.copy-btn')?.setAttribute('tabindex', '-1');
+      });
+      btn.querySelector('.toggle-all-label').textContent = 'Abrir todos';
+      btn.querySelector('.icon-expand').style.display  = '';
+      btn.querySelector('.icon-collapse').style.display = 'none';
+      btn.setAttribute('aria-label', 'Abrir todos os versículos');
+    } else {
+      // Open all — mark each as read
+      const readSet = loadProgress(pillar.id);
+      items.forEach(item => {
+        item.classList.add('is-open');
+        item.querySelector('.verse-btn').setAttribute('aria-expanded', 'true');
+        item.querySelector('.copy-btn')?.setAttribute('tabindex', '0');
+        const ref = item.querySelector('.verse-ref')?.textContent;
+        if (ref) readSet.add(ref);
+      });
+      saveProgress(pillar.id, readSet);
+      renderProgressBar(pillar, readSet);
+      btn.querySelector('.toggle-all-label').textContent = 'Fechar todos';
+      btn.querySelector('.icon-expand').style.display  = 'none';
+      btn.querySelector('.icon-collapse').style.display = '';
+      btn.setAttribute('aria-label', 'Fechar todos os versículos');
     }
   }
 

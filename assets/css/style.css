@@ -612,6 +612,37 @@ body {
 .progress-wrap.is-complete .progress-complete-badge { display: inline-flex; }
 .progress-wrap.is-complete .progress-fraction       { display: none; }
 
+/* ===== TOGGLE ALL ===== */
+.verses-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: .75rem;
+}
+
+.toggle-all-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .8rem;
+  font-family: var(--font-sans);
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+
+.toggle-all-btn:hover,
+.toggle-all-btn:focus-visible {
+  color: var(--crimson);
+  border-color: var(--crimson-light);
+  background: var(--bg-subtle);
+  outline: none;
+}
+
 /* ===== VERSE ACCORDION ===== */
 .verses-list {
   display: flex;
