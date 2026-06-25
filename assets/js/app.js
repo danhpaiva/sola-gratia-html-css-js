@@ -49,9 +49,17 @@
     });
   }
 
-  // ── Render detail view ────────────────────────────────────────────────────
-  function showDetail(index) {
+  // ── Show pillar detail ────────────────────────────────────────────────────
+  // push: false when called by popstate (browser already updated the URL)
+  function showDetail(index, { push = true } = {}) {
     const pillar = PILLARS[index];
+    if (!pillar) return;
+
+    if (push) {
+      history.pushState({ pillarId: pillar.id }, '', `#${pillar.id}`);
+    }
+
+    document.title = `${pillar.title} — As Doutrinas da Graça`;
 
     detailHeader.innerHTML = `
       <span class="detail-icon" aria-hidden="true">${pillar.icon}</span>
@@ -94,20 +102,32 @@
       versesList.appendChild(item);
     });
 
-    // Show detail, hide grid
-    pillarsSection.hidden  = true;
-    detailSection.hidden   = false;
+    pillarsSection.hidden = true;
+    detailSection.hidden  = false;
+    clearSearch();
 
-    // Scroll to top of detail and focus back button
     detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     backBtn.focus({ preventScroll: true });
+  }
+
+  // ── Show grid (home) ──────────────────────────────────────────────────────
+  // push: false when called by popstate
+  function showGrid({ push = true } = {}) {
+    if (push) {
+      history.pushState({ pillarId: null }, '', location.pathname + location.search);
+    }
+
+    document.title = 'As Doutrinas da Graça';
+
+    detailSection.hidden  = true;
+    pillarsSection.hidden = false;
+    pillarsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ── Toggle accordion item ─────────────────────────────────────────────────
   function toggleVerse(item, btn) {
     const isOpen = item.classList.contains('is-open');
 
-    // Close all others
     versesList.querySelectorAll('.verse-item.is-open').forEach(openItem => {
       openItem.classList.remove('is-open');
       openItem.querySelector('.verse-btn').setAttribute('aria-expanded', 'false');
@@ -120,17 +140,28 @@
   }
 
   // ── Back button ───────────────────────────────────────────────────────────
-  backBtn.addEventListener('click', () => {
-    detailSection.hidden  = false; // keep visible briefly so scroll works
-    pillarsSection.hidden = false;
-    detailSection.hidden  = true;
-    pillarsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  backBtn.addEventListener('click', () => showGrid());
+
+  // ── Keyboard: Escape closes detail ───────────────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !detailSection.hidden) showGrid();
   });
 
-  // ── Keyboard: close detail with Escape ───────────────────────────────────
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !detailSection.hidden) {
-      backBtn.click();
+  // ── Hash routing ─────────────────────────────────────────────────────────
+  function indexFromHash(hash) {
+    const id = (hash || '').replace(/^#/, '');
+    return PILLARS.findIndex(p => p.id === id);
+  }
+
+  // Browser back / forward
+  window.addEventListener('popstate', (e) => {
+    const id    = e.state?.pillarId ?? (location.hash || '').replace(/^#/, '');
+    const index = PILLARS.findIndex(p => p.id === id);
+
+    if (index !== -1) {
+      showDetail(index, { push: false });
+    } else {
+      showGrid({ push: false });
     }
   });
 
@@ -147,8 +178,8 @@
   }
 
   function runSearch(raw) {
-    const query   = raw.trim();
-    const normQ   = normalize(query);
+    const query  = raw.trim();
+    const normQ  = normalize(query);
 
     searchClear.hidden = query.length === 0;
 
@@ -201,7 +232,6 @@
         const open = () => {
           clearSearch();
           showDetail(pillarIndex);
-          // Open the matching accordion item after render
           requestAnimationFrame(() => {
             const allBtns = versesList.querySelectorAll('.verse-btn');
             const target  = [...allBtns].find(b =>
@@ -243,11 +273,11 @@
   }
 
   function clearSearch() {
-    searchInput.value    = '';
-    searchClear.hidden   = true;
+    searchInput.value        = '';
+    searchClear.hidden       = true;
     searchStatus.textContent = '';
-    searchResults.hidden = true;
-    pillarsGrid.hidden   = false;
+    searchResults.hidden     = true;
+    pillarsGrid.hidden       = false;
   }
 
   let debounceTimer;
@@ -256,14 +286,8 @@
     debounceTimer = setTimeout(() => runSearch(searchInput.value), 200);
   });
 
-  searchClear.addEventListener('click', () => {
-    clearSearch();
-    searchInput.focus();
-  });
-
-  searchInput.addEventListener('keydown', e => {
-    if (e.key === 'Escape') clearSearch();
-  });
+  searchClear.addEventListener('click', () => { clearSearch(); searchInput.focus(); });
+  searchInput.addEventListener('keydown', e => { if (e.key === 'Escape') clearSearch(); });
 
   // ── Theme toggle ─────────────────────────────────────────────────────────
   const html        = document.documentElement;
@@ -289,17 +313,21 @@
   }
 
   themeBtn.addEventListener('click', toggleTheme);
-
-  // Apply on load (saved preference or system default)
   applyTheme(resolvedTheme());
-
-  // React to OS-level changes when no manual preference is saved
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      applyTheme(e.matches ? 'dark' : 'light');
-    }
+    if (!localStorage.getItem(STORAGE_KEY)) applyTheme(e.matches ? 'dark' : 'light');
   });
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   renderGrid();
+
+  // Seed initial history state so popstate fires correctly on first back
+  const initialIndex = indexFromHash(location.hash);
+  if (initialIndex !== -1) {
+    // Replace (not push) so the entry before this page stays reachable
+    history.replaceState({ pillarId: PILLARS[initialIndex].id }, '', location.hash);
+    showDetail(initialIndex, { push: false });
+  } else {
+    history.replaceState({ pillarId: null }, '', location.href);
+  }
 })();
