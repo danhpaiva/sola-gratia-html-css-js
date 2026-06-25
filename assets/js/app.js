@@ -11,6 +11,11 @@
   const searchClear     = document.getElementById('search-clear');
   const searchStatus    = document.getElementById('search-status');
   const searchResults   = document.getElementById('search-results');
+  const favoritesView   = document.getElementById('favorites-view');
+  const favList         = document.getElementById('fav-list');
+  const favBackBtn      = document.getElementById('fav-back-btn');
+  const favBadge        = document.getElementById('fav-badge');
+  const navFavBtn       = document.getElementById('nav-favorites-btn');
 
   // ── Render card grid ─────────────────────────────────────────────────────
   function renderGrid() {
@@ -106,6 +111,162 @@
       btn.classList.add('is-copied');
       setTimeout(() => btn.classList.remove('is-copied'), 2000);
     });
+  }
+
+  // ── Favorites ────────────────────────────────────────────────────────────
+  const FAV_KEY = 'sg-favorites';
+
+  function loadFavorites() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); }
+    catch { return []; }
+  }
+
+  function saveFavorites(favs) {
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+    updateFavBadge();
+  }
+
+  function isFavorited(pillarId, ref) {
+    return loadFavorites().some(f => f.pillarId === pillarId && f.ref === ref);
+  }
+
+  function toggleFavorite(pillarId, ref, btn) {
+    const favs = loadFavorites();
+    const idx  = favs.findIndex(f => f.pillarId === pillarId && f.ref === ref);
+    if (idx === -1) favs.push({ pillarId, ref });
+    else            favs.splice(idx, 1);
+    saveFavorites(favs);
+    applyFavBtn(btn, idx === -1);
+  }
+
+  function applyFavBtn(btn, fav) {
+    btn.classList.toggle('is-favorited', fav);
+    btn.setAttribute('aria-label', fav ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
+    btn.querySelector('.fav-label').textContent = fav ? 'Salvo' : 'Salvar';
+  }
+
+  function updateFavBadge() {
+    const count = loadFavorites().length;
+    favBadge.textContent = count;
+    favBadge.hidden      = count === 0;
+  }
+
+  // ── Favorites view ───────────────────────────────────────────────────────
+  function showFavorites({ push = true } = {}) {
+    if (push) history.pushState({ view: 'favorites' }, '', '#favoritos');
+    document.title = 'Meus Versículos — As Doutrinas da Graça';
+
+    const favs = loadFavorites();
+
+    favList.innerHTML = '';
+
+    if (favs.length === 0) {
+      favList.innerHTML = `
+        <div class="fav-empty">
+          <div class="fav-empty-icon" aria-hidden="true">🤍</div>
+          <p>Nenhum versículo salvo ainda.<br>
+          Abra um pilar e clique em <strong>Salvar</strong> nos versículos que quiser revisar.</p>
+        </div>`;
+    } else {
+      // Group by pillar preserving pillar order
+      PILLARS.forEach(pillar => {
+        const group = favs.filter(f => f.pillarId === pillar.id);
+        if (!group.length) return;
+
+        const groupEl = document.createElement('div');
+        groupEl.innerHTML = `
+          <div class="fav-group-header">
+            <span class="fav-group-icon" aria-hidden="true">${pillar.icon}</span>
+            <span class="fav-group-title">${pillar.title}</span>
+            <span class="fav-group-count">${group.length}</span>
+          </div>`;
+
+        group.forEach(({ ref }) => {
+          const verse = pillar.verses.find(v => v.ref === ref);
+          if (!verse) return;
+
+          const item = document.createElement('div');
+          item.className = 'fav-item';
+          item.innerHTML = `
+            <div class="fav-item-ref">${verse.ref}</div>
+            <p class="fav-item-text">${verse.text}</p>
+            <div class="fav-item-actions">
+              <button class="fav-goto-btn" data-pillar="${pillar.id}" data-ref="${verse.ref}" aria-label="Ver ${verse.ref} em ${pillar.title}">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                Ir ao pilar
+              </button>
+              <button class="copy-btn" aria-label="Copiar ${verse.ref}">
+                <span class="copy-icon-default">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  Copiar
+                </span>
+                <span class="copy-icon-done">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  Copiado!
+                </span>
+              </button>
+              <button class="fav-btn is-favorited" data-pillar="${pillar.id}" data-ref="${verse.ref}" aria-label="Remover dos favoritos">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span class="fav-label">Salvo</span>
+              </button>
+            </div>`;
+
+          // Copy
+          item.querySelector('.copy-btn').addEventListener('click', (e) => {
+            copyVerse(verse.ref, verse.text, e.currentTarget);
+          });
+
+          // Go to pillar
+          item.querySelector('.fav-goto-btn').addEventListener('click', () => {
+            const idx = PILLARS.findIndex(p => p.id === pillar.id);
+            showDetail(idx);
+            // After render, open & scroll to the verse
+            requestAnimationFrame(() => {
+              const target = [...versesList.querySelectorAll('.verse-btn')]
+                .find(b => normalize(b.querySelector('.verse-ref').textContent) === normalize(verse.ref));
+              if (target) {
+                toggleVerse(target.closest('.verse-item'), target, pillar, verse.ref);
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            });
+          });
+
+          // Remove from favorites
+          item.querySelector('.fav-btn').addEventListener('click', (e) => {
+            const btn = e.currentTarget;
+            toggleFavorite(pillar.id, verse.ref, btn);
+            // Remove card with animation
+            item.style.transition = 'opacity 250ms, transform 250ms';
+            item.style.opacity    = '0';
+            item.style.transform  = 'translateX(12px)';
+            setTimeout(() => {
+              item.remove();
+              // Remove group if empty
+              if (!groupEl.querySelector('.fav-item')) groupEl.remove();
+              // Show empty state if no more favs
+              if (!favList.children.length) showFavorites({ push: false });
+              document.title = 'Meus Versículos — As Doutrinas da Graça';
+            }, 260);
+          });
+
+          groupEl.appendChild(item);
+        });
+
+        favList.appendChild(groupEl);
+      });
+    }
+
+    document.getElementById('fav-description').textContent =
+      favs.length === 0
+        ? 'Seus versículos marcados para revisão.'
+        : `${favs.length} versículo${favs.length > 1 ? 's' : ''} salvo${favs.length > 1 ? 's' : ''}`;
+
+    pillarsSection.hidden  = true;
+    detailSection.hidden   = true;
+    favoritesView.hidden   = false;
+    clearSearch();
+    favoritesView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    favBackBtn.focus({ preventScroll: true });
   }
 
   // ── Progress tracking ────────────────────────────────────────────────────
@@ -214,6 +375,16 @@
                   Copiado!
                 </span>
               </button>
+              <button class="fav-btn ${isFavorited(pillar.id, verse.ref) ? 'is-favorited' : ''}"
+                      aria-label="${isFavorited(pillar.id, verse.ref) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}"
+                      tabindex="-1">
+                <svg width="13" height="13" viewBox="0 0 24 24"
+                     fill="${isFavorited(pillar.id, verse.ref) ? 'currentColor' : 'none'}"
+                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                <span class="fav-label">${isFavorited(pillar.id, verse.ref) ? 'Salvo' : 'Salvar'}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -221,11 +392,19 @@
 
       const btn     = item.querySelector('.verse-btn');
       const copyBtn = item.querySelector('.copy-btn');
+      const favBtn  = item.querySelector('.fav-btn');
 
       btn.addEventListener('click', () => toggleVerse(item, btn, pillar, verse.ref));
       copyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         copyVerse(verse.ref, verse.text, copyBtn);
+      });
+      favBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Update SVG fill on toggle
+        const willFav = !favBtn.classList.contains('is-favorited');
+        favBtn.querySelector('svg').setAttribute('fill', willFav ? 'currentColor' : 'none');
+        toggleFavorite(pillar.id, verse.ref, favBtn);
       });
 
       versesList.appendChild(item);
@@ -252,8 +431,9 @@
       toggleAll(pillar);
     });
 
-    pillarsSection.hidden = true;
-    detailSection.hidden  = false;
+    pillarsSection.hidden  = true;
+    favoritesView.hidden   = true;
+    detailSection.hidden   = false;
     clearSearch();
 
     detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -269,8 +449,9 @@
 
     document.title = 'As Doutrinas da Graça';
 
-    detailSection.hidden  = true;
-    pillarsSection.hidden = false;
+    detailSection.hidden   = true;
+    favoritesView.hidden   = true;
+    pillarsSection.hidden  = false;
     pillarsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -282,12 +463,14 @@
       openItem.classList.remove('is-open');
       openItem.querySelector('.verse-btn').setAttribute('aria-expanded', 'false');
       openItem.querySelector('.copy-btn')?.setAttribute('tabindex', '-1');
+      openItem.querySelector('.fav-btn')?.setAttribute('tabindex', '-1');
     });
 
     if (!isOpen) {
       item.classList.add('is-open');
       btn.setAttribute('aria-expanded', 'true');
       item.querySelector('.copy-btn')?.setAttribute('tabindex', '0');
+      item.querySelector('.fav-btn')?.setAttribute('tabindex', '0');
 
       // Mark as read and update progress
       if (pillar && verseRef) {
@@ -351,15 +534,25 @@
 
   // Browser back / forward
   window.addEventListener('popstate', (e) => {
-    const id    = e.state?.pillarId ?? (location.hash || '').replace(/^#/, '');
+    const hash = (location.hash || '').replace(/^#/, '');
+
+    if (hash === 'favoritos' || e.state?.view === 'favorites') {
+      showFavorites({ push: false });
+      return;
+    }
+
+    const id    = e.state?.pillarId ?? hash;
     const index = PILLARS.findIndex(p => p.id === id);
 
-    if (index !== -1) {
-      showDetail(index, { push: false });
-    } else {
-      showGrid({ push: false });
-    }
+    if (index !== -1) showDetail(index, { push: false });
+    else              showGrid({ push: false });
   });
+
+  // Nav favorites button
+  navFavBtn.addEventListener('click', () => showFavorites());
+
+  // Favorites back button
+  favBackBtn.addEventListener('click', () => showGrid());
 
   // ── Search ───────────────────────────────────────────────────────────────
   function normalize(str) {
@@ -517,13 +710,19 @@
   // ── Boot ──────────────────────────────────────────────────────────────────
   renderGrid();
 
-  // Seed initial history state so popstate fires correctly on first back
+  // Seed initial history state
+  const initialHash  = (location.hash || '').replace(/^#/, '');
   const initialIndex = indexFromHash(location.hash);
-  if (initialIndex !== -1) {
-    // Replace (not push) so the entry before this page stays reachable
+
+  if (initialHash === 'favoritos') {
+    history.replaceState({ view: 'favorites' }, '', location.hash);
+    showFavorites({ push: false });
+  } else if (initialIndex !== -1) {
     history.replaceState({ pillarId: PILLARS[initialIndex].id }, '', location.hash);
     showDetail(initialIndex, { push: false });
   } else {
     history.replaceState({ pillarId: null }, '', location.href);
   }
+
+  updateFavBadge();
 })();
