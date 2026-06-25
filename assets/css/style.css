@@ -35,6 +35,9 @@
 
 /* ── Dark theme variables ── */
 [data-theme="dark"] {
+  --crimson:        #93c5fd;
+  --crimson-light:  #bfdbfe;
+
   --bg-page:        #080e1a;
   --bg-surface:     #111827;
   --bg-subtle:      #1a2537;
@@ -51,6 +54,9 @@
 /* ── System dark preference (auto) ── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --crimson:        #93c5fd;
+    --crimson-light:  #bfdbfe;
+
     --bg-page:        #080e1a;
     --bg-surface:     #111827;
     --bg-subtle:      #1a2537;
@@ -1052,6 +1058,16 @@ body {
   padding-top: .75rem;
   padding-bottom: .75rem;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+[data-theme="dark"] .about-note {
+  background: rgba(147,197,253,.07);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .about-note {
+    background: rgba(147,197,253,.07);
+  }
 }
 
 .about-note cite {
