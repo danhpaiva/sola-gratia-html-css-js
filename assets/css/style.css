@@ -1107,3 +1107,174 @@ body {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== PRINT ===== */
+@media print {
+  /* ── Reset & base ── */
+  *, *::before, *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  :root {
+    --bg-page:        #fff;
+    --bg-surface:     #fff;
+    --bg-subtle:      #f5f5f5;
+    --text-primary:   #000;
+    --text-secondary: #111;
+    --text-muted:     #555;
+    --border:         #ccc;
+    --crimson:        #6b0000;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+    line-height: 1.6;
+  }
+
+  /* ── Hide everything except active content ── */
+  .site-header,
+  .hero,
+  .about-section,
+  .site-footer,
+  .search-wrapper,
+  .verses-toolbar,
+  .verse-footer,
+  .back-btn,
+  .progress-wrap,
+  .detail-description,
+  #pillars:not([hidden]),      /* hide grid if pillar detail is active */
+  .pillars-grid,
+  .search-results,
+  #favorites-view[hidden],
+  #pillar-detail[hidden],
+  #pillars[hidden] {
+    display: none !important;
+  }
+
+  /* ── Main layout ── */
+  main { padding: 0; }
+  .section-inner { max-width: 100%; padding: 0; }
+
+  /* ── Detail & favorites views ── */
+  .detail-section,
+  .favorites-section {
+    padding: 0;
+    min-height: unset;
+  }
+
+  /* ── Pillar title ── */
+  .detail-title,
+  .fav-header h2 {
+    font-family: Georgia, serif;
+    font-size: 18pt;
+    color: #6b0000;
+    margin-bottom: .5rem;
+    page-break-after: avoid;
+  }
+
+  .detail-icon,
+  .fav-title-icon { display: none; }
+
+  .detail-header {
+    border-bottom: 2pt solid #6b0000;
+    margin-bottom: 1rem;
+    padding-bottom: .5rem;
+  }
+
+  /* ── Force accordions open ── */
+  .verse-body {
+    display: block !important;
+    grid-template-rows: unset !important;
+  }
+
+  .verse-body-inner {
+    overflow: visible !important;
+    border-top: none;
+  }
+
+  /* ── Verse items ── */
+  .verse-item {
+    border: none;
+    border-bottom: .5pt solid #ccc;
+    border-radius: 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 0;
+  }
+
+  .verse-item.is-open,
+  .verse-item { box-shadow: none; }
+
+  .verse-btn {
+    padding: .5rem 0;
+    background: none !important;
+    border: none;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .verse-ref {
+    font-family: Georgia, serif;
+    font-size: 10pt;
+    font-weight: 700;
+    color: #6b0000;
+  }
+
+  .verse-chevron { display: none; }
+
+  .verse-text {
+    font-family: Georgia, serif;
+    font-size: 10.5pt;
+    line-height: 1.7;
+    color: #111;
+    padding: .1rem 0 .6rem;
+    border-top: none;
+    font-style: italic;
+  }
+
+  /* ── Favorites view ── */
+  .fav-header { border-bottom: 2pt solid #6b0000; margin-bottom: 1rem; }
+  .fav-description { display: none; }
+  .fav-group-header {
+    border-bottom: 1pt solid #aaa;
+    margin-top: 1rem;
+    padding-bottom: .25rem;
+  }
+  .fav-group-count,
+  .fav-item-actions { display: none; }
+  .fav-item {
+    border: none;
+    border-bottom: .5pt solid #ccc;
+    border-radius: 0;
+    padding: .5rem 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .fav-item-ref { color: #6b0000; font-size: 10pt; font-weight: 700; margin-bottom: .2rem; }
+  .fav-item-text { font-size: 10.5pt; margin-bottom: 0; }
+
+  /* ── Print footer ── */
+  .detail-section::after,
+  .favorites-section::after {
+    content: "As Doutrinas da Graça — versículos da NVI";
+    display: block;
+    margin-top: 1.5rem;
+    padding-top: .5rem;
+    border-top: .5pt solid #aaa;
+    font-size: 8pt;
+    color: #666;
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+
+  /* ── Page setup ── */
+  @page {
+    margin: 1.5cm 2cm;
+    size: A4 portrait;
+  }
+}
