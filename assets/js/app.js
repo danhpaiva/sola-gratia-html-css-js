@@ -181,12 +181,14 @@
             <span class="fav-group-count">${group.length}</span>
           </div>`;
 
+        let favItemIndex = 0;
         group.forEach(({ ref }) => {
           const verse = pillar.verses.find(v => v.ref === ref);
           if (!verse) return;
 
           const item = document.createElement('div');
           item.className = 'fav-item';
+          item.style.setProperty('--stagger', Math.min(favItemIndex++, 10) * 35 + 150);
           item.innerHTML = `
             <div class="fav-item-ref">${verse.ref}</div>
             <p class="fav-item-text">${verse.text}</p>
@@ -264,6 +266,9 @@
     pillarsSection.hidden  = true;
     detailSection.hidden   = true;
     favoritesView.hidden   = false;
+    favoritesView.classList.remove('is-entering');
+    void favoritesView.offsetWidth;
+    favoritesView.classList.add('is-entering');
     clearSearch();
     favoritesView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     favBackBtn.focus({ preventScroll: true });
@@ -345,6 +350,7 @@
       const item = document.createElement('div');
       item.className = 'verse-item';
       item.setAttribute('role', 'listitem');
+      item.style.setProperty('--stagger', Math.min(i, 10) * 35 + 150);
 
       const btnId  = `verse-btn-${index}-${i}`;
       const bodyId = `verse-body-${index}-${i}`;
@@ -434,6 +440,9 @@
     pillarsSection.hidden  = true;
     favoritesView.hidden   = true;
     detailSection.hidden   = false;
+    detailSection.classList.remove('is-entering');
+    void detailSection.offsetWidth;
+    detailSection.classList.add('is-entering');
     clearSearch();
 
     detailSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -452,6 +461,9 @@
     detailSection.hidden   = true;
     favoritesView.hidden   = true;
     pillarsSection.hidden  = false;
+    pillarsSection.classList.remove('is-entering');
+    void pillarsSection.offsetWidth;
+    pillarsSection.classList.add('is-entering');
     pillarsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
